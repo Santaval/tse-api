@@ -22,40 +22,42 @@ const scrapeLogic = async (res, cedula) => {
     await page.type("#txtcedula", cedula);
     await page.click("#btnConsultaCedula");
 
+    let found = true
 
-  
-    if (await page.$("#Button1") != null) {
+    try {
       await page.waitForSelector("#LinkButton11");
-      await page.click("#LinkButton11");
-      await page.waitForSelector("#lblnombre");
-    } else {
+    } catch(e) {
       res.send('Persona no encontrada')
       return
     }
+    await page.click("#LinkButton11");
+
+
+    await page.waitForSelector("#lblnombre");
+
     // cedula,nombre, padre, cedulaPadre, madre, cedulaMadre, fechaNacimiento, nacionalidad, edad, marginalidad
 
-    const info = await page.evaluate( async () => {
-        return {
-          cedula: document.getElementById("lblcedula").textContent,
-          nombre: document.getElementById("lblnombre").textContent,
-          primerApellido:
-            document.getElementById("lblprimer_apellido").textContent,
-          segundoApellido: document.getElementById("lblsegundo_apellido")
-            .textContent,
-          padre: {
-            nombre: document.getElementById("lblnombre_padre").textContent,
-            cedula: document.getElementById("lblid_padre").textContent,
-          },
-          madre: {
-            nombre: document.getElementById("lblnombre_madre").textContent,
-            cedula: document.getElementById("lblid_madre").textContent,
-          },
-          fechaNacimiento: document.getElementById("lblfecha_nacimiento")
-            .textContent,
-          nacionalidad: document.getElementById("lblnacionalidad").textContent,
-          marginalidad:
-            document.getElementById("lblLeyendaMarginal").textContent,
-        };
+    const info = await page.evaluate(async () => {
+      return {
+        cedula: document.getElementById("lblcedula").textContent,
+        nombre: document.getElementById("lblnombre").textContent,
+        primerApellido:
+          document.getElementById("lblprimer_apellido").textContent,
+        segundoApellido: document.getElementById("lblsegundo_apellido")
+          .textContent,
+        padre: {
+          nombre: document.getElementById("lblnombre_padre").textContent,
+          cedula: document.getElementById("lblid_padre").textContent,
+        },
+        madre: {
+          nombre: document.getElementById("lblnombre_madre").textContent,
+          cedula: document.getElementById("lblid_madre").textContent,
+        },
+        fechaNacimiento: document.getElementById("lblfecha_nacimiento")
+          .textContent,
+        nacionalidad: document.getElementById("lblnacionalidad").textContent,
+        marginalidad: document.getElementById("lblLeyendaMarginal").textContent,
+      };
     });
 
     res.send(info);
