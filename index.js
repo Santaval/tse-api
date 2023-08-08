@@ -10,7 +10,7 @@ app.use(cors({
 
 app.use(morgan('dev'))
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 app.get("/cedula=:cedula", (req, res) => {
   scrapeLogic(res,req.params.cedula);

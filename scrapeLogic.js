@@ -2,54 +2,45 @@ const puppeteer = require("puppeteer");
 require("dotenv").config();
 
 const scrapeLogic = async (res, cedula) => {
-  const browser = await puppeteer.launch({
-    args: [
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-      "--single-process",
-      "--no-zygote",
-    ],
-    executablePath:
-      process.env.NODE_ENV === "production"
-        ? process.env.PUPPETEER_EXECUTABLE_PATH
-        : puppeteer.executablePath(),
-  });
   try {
+    const browser = await puppeteer.launch({
+      args: [
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote",
+      ],
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
+    });
+
     const page = await browser.newPage();
-    await page.goto(
-      "https://servicioselectorales.tse.go.cr/chc/consulta_cedula.aspx"
-    );
+    await page.goto("https://servicioselectorales.tse.go.cr/chc/consulta_cedula.aspx");
     await page.type("#txtcedula", cedula);
     await page.click("#btnConsultaCedula");
 
-    let found = true
+    const linkSelector = "#LinkButton11";
+    const foundSelector = await page.waitForSelector(linkSelector, { timeout: 10000 });
 
-    try {
-      await page.waitForSelector("#LinkButton11");
-    } catch(e) {
-      res.send('Persona no encontrada')
-      return
+    if (!foundSelector) {
+      res.send('Persona no encontrada');
+      return;
     }
-    await page.click("#LinkButton11");
 
-
+    await page.click(linkSelector);
     await page.waitForSelector("#lblnombre");
 
-    // cedula,nombre , fechaNacimiento, 
-
-    const info = await page.evaluate(async () => {
+    const info = await page.evaluate(() => {
       return {
         cedula: document.getElementById("lblcedula").textContent,
         nombre: document.getElementById("lblnombre").textContent,
-        primerApellido:
-          document.getElementById("lblprimer_apellido").textContent,
-        segundoApellido: document.getElementById("lblsegundo_apellido")
-          .textContent,
-          fechaNacimiento: document.getElementById("lblfecha_nacimiento")
-            .textContent,
+        primerApellido: document.getElementById("lblprimer_apellido").textContent,
+        segundoApellido: document.getElementById("lblsegundo_apellido").textContent,
+        fechaNacimiento: document.getElementById("lblfecha_nacimiento").textContent,
 
-
-        // uncomment to get more info
+          // uncomment to get more info
 
         // padre: {
         //   nombre: document.getElementById("lblnombre_padre").textContent,
@@ -65,11 +56,17 @@ const scrapeLogic = async (res, cedula) => {
     });
 
     res.send(info);
-  } catch (e) {
-    console.error(e);
-    res.send(`Something went wrong while running Puppeteer: ${e}`);
+  } catch (error) {
+    console.error(error);
+    if (error.name === 'TimeoutError') {
+      res.status(500).send('La solicitud excedió el tiempo límite');
+    } else {
+      res.status(500).send(`Ocurrió un error durante la ejecución de Puppeteer: ${error.message}`);
+    }
   } finally {
-    await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   }
 };
 
