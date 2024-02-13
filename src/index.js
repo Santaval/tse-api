@@ -10,15 +10,14 @@ app.use(cors({
 
 app.use(morgan('dev'))
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 7504;
 
-app.get("/cedula=:cedula", (req, res) => {
-  scrapeLogic(res,req.params.cedula);
-});
+/* ---------- V1 ---------- */
+app.use(require("./routes/v1/home"));
+app.use(require("./routes/v1/cedula"));
 
-app.get("/", (req, res) => {
-    res.send('Servidor para obtener datos del TSE por cedula')
-});
+/* ---------- V2 ---------- */
+
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
