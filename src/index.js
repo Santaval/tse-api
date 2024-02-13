@@ -3,6 +3,7 @@ const cors = require('cors')
 const app = express();
 const morgan = require('morgan')
 const patt = require('path')
+const errorsHandler = require('./middlewares/errorsHandler')
 
 app.use(cors({
   origin: '*'
@@ -11,6 +12,8 @@ app.use(cors({
 app.use(morgan('dev'))
 
 const PORT = process.env.PORT || 7504;
+
+app.use(errorsHandler)
 
 app.use(express.static(patt.join(__dirname, 'docs')));
 
