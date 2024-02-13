@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
 app.use(require("./routes/v1/cedula"));
 
 /* ---------- V2 ---------- */
+app.use("/api/v2/cedula", require("./routes/v2/cedula"));
 
 
 app.listen(PORT, () => {
