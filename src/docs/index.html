@@ -83,7 +83,7 @@
           <pre>
     API Endpoint
 
-    https://tseapi.savaldev.com/api/cedula
+    http://tseapi.savaldev.com/api/v2/cedula/:cedula
                 </pre
           >
           <p>
@@ -97,7 +97,7 @@
           <h2>By cedula</h2>
           <pre><code class="bash">
 # Here is a fetch request example
-fetch('http://tseapi.savaldev.com/cedula/:cedula')
+fetch('http://tseapi.savaldev.com/api/v2/cedula/:cedula')
     .then(response => response.json())
     .then(data => console.log(data));
 
@@ -108,7 +108,7 @@ fetch('http://tseapi.savaldev.com/cedula/:cedula')
             To get citizen information, you need to make a GET request to the following endpoint with the cedula number as a parameter:
             :<br />
             <code class="higlighted break-word"
-              >http://tseapi.savaldev.com/cedula/:cedula</code
+              >http://tseapi.savaldev.com/api/v2/cedula/:cedula</code
             >
           </p>
           <br />
